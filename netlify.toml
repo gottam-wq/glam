@@ -1,0 +1,36 @@
+[build]
+  publish = "glam-php/glam-php"
+
+# Old PHP URLs -> static pages
+[[redirects]]
+  from = "/index.php"
+  to = "/"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/services.php"
+  to = "/services"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/gallery.php"
+  to = "/gallery"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/packages.php"
+  to = "/packages"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/contact.php"
+  to = "/contact"
+  status = 301
+  force = true
+
+# Don't serve the PHP source files
+[[redirects]]
+  from = "/includes/*"
+  to = "/"
+  status = 404
+  force = true

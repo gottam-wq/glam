@@ -1,4 +1,4 @@
-/* Glam by Sanyukta - site scripts (shared by every PHP page) */
+/* Glam by Sanyukta - site scripts (shared by every page) */
 (function () {
   'use strict';
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -129,7 +129,41 @@
     });
   }
 
-  /* ---- Contact: scroll to form feedback ---- */
-  var ok = $('#ok');
-  if (ok) ok.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  /* ---- Contact: booking form (validated here, stored by Netlify Forms, then sent to WhatsApp) ---- */
+  var bf = $('#booking'), ok = $('#ok');
+  if (bf && ok) {
+    var WA = '919468971373', OWNER = 'Sanyukta';
+    var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    var d0 = new Date(), today = d0.getFullYear() + '-' + pad(d0.getMonth() + 1) + '-' + pad(d0.getDate());
+    if (bf.elements["date"]) bf.elements["date"].min = today;
+    var esc = function (s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+    bf.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name = bf.elements["name"].value.trim(), phone = bf.elements["phone"].value.trim(), svc = bf.elements["service"].value, date = bf.elements["date"].value, errs = [];
+      if (name.length < 2 || name.length > 80) errs.push('Please add your name.');
+      if (!/^[0-9+\-\s()]{8,18}$/.test(phone)) errs.push('Please add a valid phone number.');
+      if (date && date < today) errs.push('Please choose today or a future date.');
+      if (errs.length) {
+        ok.className = 'show err'; ok.setAttribute('role', 'alert');
+        ok.innerHTML = '<ul>' + errs.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+        ok.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        return;
+      }
+      var msg = 'Hi ' + OWNER + ', I would like to book ' + svc + (date ? ' on ' + date : '') + '. Name: ' + name + ', Phone: ' + phone + '.';
+      var wa = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(msg);
+      var btn = $('button[type=submit]', bf); btn.disabled = true;
+      var done = function () {
+        btn.disabled = false;
+        ok.className = 'show'; ok.setAttribute('role', 'status');
+        ok.innerHTML = 'Thank you, ' + esc(name) + '!<br><a class="btn f wa" href="' + esc(wa) + '" target="_blank" rel="noopener">Tap here to send on WhatsApp</a>';
+        ok.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        bf.reset(); bf.elements["date"].min = today;
+      };
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(bf)).toString()
+      }).then(done, done);
+    });
+  }
 })();
