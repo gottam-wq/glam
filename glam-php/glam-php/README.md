@@ -29,3 +29,10 @@ Upload the whole folder to `public_html` (cPanel / Hostinger etc.). `data/` must
 Contact form validates on the server (CSRF + honeypot), saves each request to `data/bookings.csv`
 (blocked from the web via .htaccess) and gives the visitor a WhatsApp button with the message pre-filled.
 Set `SEND_EMAIL_ON_BOOKING` to true in config.php to also get an email (needs mail() on your host).
+
+## Netlify (static hosting)
+Netlify does not run PHP, so the site is served from pre-rendered static pages:
+`index.html`, `services.html`, `gallery.html`, `packages.html`, `contact.html` (served at `/`, `/services`, ...).
+The `.php` files are kept as the source. If you edit them, update the matching `.html` file too.
+On Netlify the booking form is stored by Netlify Forms (form name `booking`, see Forms in the Netlify dashboard)
+and the visitor gets a WhatsApp button with the message pre-filled.
